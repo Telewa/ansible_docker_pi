@@ -1,0 +1,35 @@
+---
+- hosts:
+  - all
+  become: true
+  roles:
+  - uninstall_docker
+
+  pre_tasks:
+  - debug: msg="{{ ansible_os_family }}"
+  - name: (Debian)Update package cache if last run was more than 6 hours ago
+    apt: update_cache=yes cache_valid_time={{ 60 * 60 * 6 }}
+    when: ansible_os_family == "Debian"
+
+  - name: Add authorized keys
+    authorized_key:
+      user: "{{ item.name }}"
+      key: "{{ item.key }}"
+      state: present
+    with_items: "{{ SSH_USERS }}"
+
+  post_tasks:
+  - name: Remove authorized_keys
+    authorized_key:
+      user: "{{ item.name }}"
+      key: "{{ item.key }}"
+      state: absent
+    with_items: "{{ SSH_USERS }}"
+
+    # these are some very optional cleanup tasks
+  - name: Clean up
+    apt:
+      autoclean: yes
+      autoremove: yes
+
+

@@ -1,0 +1,5 @@
+---
+ansible_connection: ssh
+ansible_user: computer_user
+ansible_ssh_pass: computer_password
+ansible_sudo_pass: computer_password

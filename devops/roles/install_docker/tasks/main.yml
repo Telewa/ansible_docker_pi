@@ -1,0 +1,92 @@
+---
+
+- name: Create the application folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_items:
+    - "{{ INSTALL_DIR }}"
+
+- name: Get docker
+  get_url:
+    url: https://get.docker.com
+    dest: "{{ INSTALL_DIR }}/get-docker.sh"
+    mode: "a+x"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    checksum: "md5:41587a5e3b3cdfdec2580853361f8b63"
+  register: get_docker
+- debug: msg="{{ get_docker }}"
+
+- name: Check if docker is already installed
+  stat: path=/usr/bin/docker
+  register: docker_exists
+
+- name: Install docker
+  shell: "{{ INSTALL_DIR }}/get-docker.sh"
+  register: install_docker
+  when: docker_exists.stat.exists == False
+- debug: msg="{{ install_docker }}"
+
+- name: Allow use docker as non-root user
+  shell: usermod -aG docker {{ ansible_user }}
+  register: allow_non_root
+- debug: msg="{{ allow_non_root }}"
+
+- name: Confirm docker version
+  shell: docker --version
+  register: docker_version
+- debug: msg="{{ docker_version }}"
+
+- name: Check if docker-compose is already installed
+  stat: path=/usr/bin/docker-compose
+  register: docker_compose_exists
+
+- name: Confirm computer architecture
+  shell: uname -m
+  register: architecture
+- debug: msg="{{ architecture }}"
+
+- name: Confirm computer os
+  shell: uname -s
+  register: os
+- debug: msg="{{ os }}"
+
+- name: Get docker-compose
+  get_url:
+    url: "{{item.url}}"
+    dest: "{{ INSTALL_DIR }}/docker-compose.sh"
+    mode: "a+x"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    checksum: "{{item.checksum}}"
+  register: install_docker_compose
+  when:
+#    - docker_compose_exists.stat.exists == False
+    - architecture.stdout is match(item.regex)
+  with_items:
+    - name: "X86"
+      url: "https://github.com/docker/compose/releases/download/{{DOCKER_COMPOSE_X86_VERSION}}/docker-compose-{{os.stdout}}-{{architecture.stdout}}"
+      regex: ".*x86_64.*"
+      checksum: "md5:215daec920746cf607aec5e8e1ac0c7a"
+    - name: "ARM"
+      url: "https://github.com/javabean/arm-compose/releases/download/{{DOCKER_COMPOSE_ARM_VERSION}}/docker-compose-Linux-armv7l"
+      regex: ".*arm.*"
+      checksum: "md5:ea4815004b248e1c0c696be6b1dfea10"
+- debug: msg="{{ install_docker_compose }}"
+
+- name: Install docker-compose
+  file:
+    src: "{{ INSTALL_DIR }}/docker-compose.sh"
+    dest: "/usr/bin/docker-compose"
+    state: link
+  register: link_docker_compose
+- debug: msg="{{ link_docker_compose }}"
+
+- name: Confirm docker-compose version
+  shell: "docker-compose --version"
+  register: docker_compose_version
+- debug: msg="{{ docker_compose_version }}"

@@ -1,0 +1,23 @@
+---
+
+- name: "uninstall docker packages"
+  package:
+   name: "{{ item }}"
+   state: absent
+  with_items:
+   - docker
+   - docker-engine
+   - docker-ce
+   - docker.io
+   - docker-compose
+   - docker-enter
+
+- name: "uninstall docker-compose files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /usr/local/bin/docker-enter
+    - /usr/local/bin/docker-compose
+    - /usr/bin/docker-compose
+    - "{{ INSTALL_DIR }}"

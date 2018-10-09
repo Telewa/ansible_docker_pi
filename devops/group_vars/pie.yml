@@ -1,0 +1,5 @@
+---
+ansible_connection: ssh
+ansible_user: pi
+ansible_ssh_pass: raspberry_pi_password
+ansible_sudo_pass: raspberry_pi_password
