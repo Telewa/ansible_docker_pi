@@ -1,4 +1,4 @@
-# Ansible Docker and Raspberry Pi
+# Ansible, Docker and Raspberry Pi
 
 This is code to install docker and docker-compose in my ubuntu laptop and raspberry pi hosts.
 Of course the important issue is that raspberry pi is arm while the ubuntu laptop is x86-64.
