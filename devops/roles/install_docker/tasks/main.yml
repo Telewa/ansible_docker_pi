@@ -65,7 +65,7 @@
     checksum: "{{item.checksum}}"
   register: install_docker_compose
   when:
-#    - docker_compose_exists.stat.exists == False
+    - docker_compose_exists.stat.exists == False
     - architecture.stdout is match(item.regex)
   with_items:
     - name: "X86"
