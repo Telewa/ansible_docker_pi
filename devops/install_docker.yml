@@ -1,7 +1,6 @@
 ---
 - hosts:
   - home
-  - pie
   become: true
   roles:
   - install_docker

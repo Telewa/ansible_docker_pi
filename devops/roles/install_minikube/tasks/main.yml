@@ -1,0 +1,50 @@
+---
+- name: Check if minikube is already installed
+  stat: path=/usr/bin/minikube
+  register: minikube_exists
+
+- name: Check if installation folder exists
+  stat: path={{ INSTALL_DIR }}
+  register: installation_folder_exists
+  when:
+    - minikube_exists.stat.exists == False
+
+- name: Create the application folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_items:
+    - "{{ INSTALL_DIR }}"
+  when:
+    - minikube_exists.stat.exists == False
+    - installation_folder_exists.stat.exists == False
+
+- name: Get minikube
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: "{{ INSTALL_DIR }}/minikube"
+    mode: "a+x"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  register: get_minikube
+  when:
+    - minikube_exists.stat.exists == False
+- debug: msg="{{ get_minikube }}"
+
+- name: Install minikube
+  file:
+    src: "{{ INSTALL_DIR }}/minikube"
+    dest: "/usr/bin/minikube"
+    state: link
+  register: link_minikube
+  when:
+  - minikube_exists.stat.exists == False
+- debug: msg="{{ link_minikube }}"
+
+- name: Confirm minikube version
+  shell: "minikube version"
+  register: minikube_version
+- debug: msg="{{ minikube_version }}"

@@ -3,7 +3,7 @@
   - home
   become: true
   roles:
-  - uninstall_docker
+  - uninstall_minikube
 
   pre_tasks:
   - debug: msg="{{ ansible_os_family }}"

@@ -1,0 +1,50 @@
+---
+- name: Check if kubectl is already installed
+  stat: path=/usr/bin/kubectl
+  register: kubectl_exists
+
+- name: Check if installation folder exists
+  stat: path={{ INSTALL_DIR }}
+  register: installation_folder_exists
+  when:
+    - kubectl_exists.stat.exists == False
+
+- name: Create the application folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  with_items:
+    - "{{ INSTALL_DIR }}"
+  when:
+    - kubectl_exists.stat.exists == False
+    - installation_folder_exists.stat.exists == False
+
+- name: Get kubectl
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/amd64/kubectl
+    dest: "{{ INSTALL_DIR }}/kubectl"
+    mode: "a+x"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  register: get_kubectl
+  when:
+    - kubectl_exists.stat.exists == False
+- debug: msg="{{ get_kubectl }}"
+
+- name: Install kubectl
+  file:
+    src: "{{ INSTALL_DIR }}/kubectl"
+    dest: "/usr/bin/kubectl"
+    state: link
+  register: link_kubectl
+  when:
+  - kubectl_exists.stat.exists == False
+- debug: msg="{{ link_kubectl }}"
+
+- name: Confirm kubectl version
+  shell: "kubectl version"
+  register: kubectl_version
+- debug: msg="{{ kubectl_version }}"

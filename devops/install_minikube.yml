@@ -3,21 +3,13 @@
   - home
   become: true
   roles:
-  - uninstall_docker
+  - install_minikube
 
   pre_tasks:
+
   - debug: msg="{{ ansible_os_family }}"
   - name: (Debian)Update package cache if last run was more than 6 hours ago
     apt: update_cache=yes cache_valid_time={{ 60 * 60 * 6 }}
     when: ansible_os_family == "Debian"
-
-
-  post_tasks:
-
-    # these are some very optional cleanup tasks
-  - name: Clean up
-    apt:
-      autoclean: yes
-      autoremove: yes
 
 

@@ -1,0 +1,9 @@
+---
+
+- name: "uninstall kubectl files"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /usr/bin/kubectl
+    - "{{ INSTALL_DIR }}/kubectl"

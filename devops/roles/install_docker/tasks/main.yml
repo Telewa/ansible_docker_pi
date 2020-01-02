@@ -1,4 +1,13 @@
 ---
+- name: Check if docker is already installed
+  stat: path=/usr/bin/docker
+  register: docker_exists
+
+- name: Check if installation folder exists
+  stat: path={{ INSTALL_DIR }}
+  register: installation_folder_exists
+  when:
+    - docker_exists.stat.exists == False
 
 - name: Create the application folders
   file:
@@ -9,6 +18,9 @@
     group: "{{ ansible_user }}"
   with_items:
     - "{{ INSTALL_DIR }}"
+  when:
+    - docker_exists.stat.exists == False
+    - installation_folder_exists.stat.exists == False
 
 - name: Get docker
   get_url:
@@ -18,12 +30,10 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 #    checksum: "md5:41587a5e3b3cdfdec2580853361f8b63"
+  when:
+    - docker_exists.stat.exists == False
   register: get_docker
 - debug: msg="{{ get_docker }}"
-
-- name: Check if docker is already installed
-  stat: path=/usr/bin/docker
-  register: docker_exists
 
 - name: Install docker
   shell: "{{ INSTALL_DIR }}/get-docker.sh"
@@ -33,6 +43,8 @@
 
 - name: Allow use docker as non-root user
   shell: usermod -aG docker {{ ansible_user }}
+  when:
+    - docker_exists.stat.exists == False
   register: allow_non_root
 - debug: msg="{{ allow_non_root }}"
 
@@ -48,11 +60,15 @@
 - name: Confirm computer architecture
   shell: uname -m
   register: architecture
+  when:
+    - docker_compose_exists.stat.exists == False
 - debug: msg="{{ architecture }}"
 
 - name: Confirm computer os
   shell: uname -s
   register: os
+  when:
+    - docker_compose_exists.stat.exists == False
 - debug: msg="{{ os }}"
 
 - name: Get docker-compose
@@ -83,6 +99,8 @@
     src: "{{ INSTALL_DIR }}/docker-compose.sh"
     dest: "/usr/bin/docker-compose"
     state: link
+  when:
+    - docker_compose_exists.stat.exists == False
   register: link_docker_compose
 - debug: msg="{{ link_docker_compose }}"
 
