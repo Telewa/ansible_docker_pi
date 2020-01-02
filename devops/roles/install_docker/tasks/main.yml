@@ -17,7 +17,7 @@
     mode: "a+x"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-    checksum: "md5:41587a5e3b3cdfdec2580853361f8b63"
+#    checksum: "md5:41587a5e3b3cdfdec2580853361f8b63"
   register: get_docker
 - debug: msg="{{ get_docker }}"
 
@@ -62,7 +62,7 @@
     mode: "a+x"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
-    checksum: "{{item.checksum}}"
+#    checksum: "{{item.checksum}}"
   register: install_docker_compose
   when:
     - docker_compose_exists.stat.exists == False
@@ -71,11 +71,11 @@
     - name: "X86"
       url: "https://github.com/docker/compose/releases/download/{{DOCKER_COMPOSE_X86_VERSION}}/docker-compose-{{os.stdout}}-{{architecture.stdout}}"
       regex: ".*x86_64.*"
-      checksum: "md5:215daec920746cf607aec5e8e1ac0c7a"
+#      checksum: "md5:215daec920746cf607aec5e8e1ac0c7a"
     - name: "ARM"
       url: "https://github.com/javabean/arm-compose/releases/download/{{DOCKER_COMPOSE_ARM_VERSION}}/docker-compose-Linux-armv7l"
       regex: ".*arm.*"
-      checksum: "md5:ea4815004b248e1c0c696be6b1dfea10"
+#      checksum: "md5:ea4815004b248e1c0c696be6b1dfea10"
 - debug: msg="{{ install_docker_compose }}"
 
 - name: Install docker-compose

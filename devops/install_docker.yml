@@ -13,19 +13,4 @@
     apt: update_cache=yes cache_valid_time={{ 60 * 60 * 6 }}
     when: ansible_os_family == "Debian"
 
-  - name: Add authorized keys
-    authorized_key:
-      user: "{{ item.name }}"
-      key: "{{ item.key }}"
-      state: present
-    with_items: "{{ SSH_USERS }}"
-
-  post_tasks:
-  - name: Remove authorized_keys
-    authorized_key:
-      user: "{{ item.name }}"
-      key: "{{ item.key }}"
-      state: absent
-    with_items: "{{ SSH_USERS }}"
-
 

@@ -8,8 +8,11 @@ To make this easy, the installation is done using ansible
 
 # Instructions
 
+## setup
+
 - update the hosts ip addresses
 - update the group_vars host details
 
-- make install install_docker
-- make uninstall_docker
+## usage
+- To install: `make install install_docker`  
+- To uninstall: `make uninstall_docker`
