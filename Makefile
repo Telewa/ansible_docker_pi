@@ -2,7 +2,7 @@
 install_kubectl: install_minikube
 	cd devops/ && ansible-playbook install_kubectl.yml
 
-install_minikube: # requires different docker
+install_minikube: install_docker
 	cd devops/ && ansible-playbook install_minikube.yml
 
 install_docker:

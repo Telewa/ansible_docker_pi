@@ -20,5 +20,6 @@
     - /usr/local/bin/docker-enter
     - /usr/local/bin/docker-compose
     - /usr/bin/docker-compose
+    - /usr/bin/docker
     - "{{ INSTALL_DIR }}/get-docker.sh"
     - "{{ INSTALL_DIR }}/docker-compose.sh"
